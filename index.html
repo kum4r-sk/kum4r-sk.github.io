@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shivam Kumar – Energy systems engineer</title>
+  <meta name="description" content="Shivam Kumar, energy engineer. Power-system modelling with PyPSA, flow-battery CFD validated against experiments, and energy-system optimisation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M2 16 Q8 4 14 16 T26 16' fill='none' stroke='%23008F84' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="wordmark" href="#top">Shivam Kumar</a>
+      <nav aria-label="Sections">
+        <a href="#project">Project</a>
+        <a href="#work">Other work</a>
+        <a href="#experience">Experience</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ============================================================ hero -->
+    <section class="hero wrap" id="top">
+      <div class="hero-text">
+        <h1>Shivam Kumar</h1>
+        <p class="lede">Energy engineer. I build models of energy systems, from flow-battery cells to national power grids, and test them against measured data.</p>
+        <p class="hero-meta">Based in Munich. M.Sc. Clean Energy Processes at FAU Erlangen-Nürnberg, with a master's thesis at Siemens Energy. Currently looking for a PhD in power-system modelling.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="#project">Read the grid project</a>
+          <a class="btn" href="cv.pdf">Download CV</a>
+          <a class="btn" href="mailto:singh.shivamk@gmail.com">Email me</a>
+        </div>
+      </div>
+
+      <figure class="instrument" aria-labelledby="inst-title">
+        <figcaption class="inst-head">
+          <h2 id="inst-title">What happens when a 3 GW power plant trips?</h2>
+          <p>Spinning generators store kinetic energy that slows the fall in grid frequency. Wind and solar plants don't. At 80&nbsp;% wind and solar, the frequency falls through the load-shedding limit. Lower the share, or let batteries respond.</p>
+        </figcaption>
+
+        <div class="chart-box">
+          <svg id="freq-chart" role="img" aria-labelledby="freq-desc"></svg>
+          <div class="tooltip" id="freq-tip" hidden></div>
+          <p id="freq-desc" class="visually-hidden" aria-live="polite"></p>
+        </div>
+
+        <div class="controls">
+          <label class="slider">
+            <span class="ctl-label">Wind and solar share of supply <output id="share-out">80&nbsp;%</output></span>
+            <input type="range" id="share" min="0" max="95" step="5" value="80">
+          </label>
+          <label class="check">
+            <input type="checkbox" id="ffr">
+            <span>Batteries provide fast frequency response</span>
+          </label>
+        </div>
+
+        <dl class="readouts">
+          <div><dt>Spinning inertia</dt><dd id="r-inertia">–</dd></div>
+          <div><dt>Initial rate of fall</dt><dd id="r-rocof">–</dd></div>
+          <div><dt>Lowest frequency</dt><dd id="r-nadir">–</dd></div>
+        </dl>
+        <p class="status" id="status" role="status"></p>
+        <p class="fine">Toy single-bus model (swing equation with governor response and load damping), stylised parameters, for illustration only. The study below uses a separate optimisation model.</p>
+      </figure>
+    </section>
+
+    <!-- ============================================================ project -->
+    <section class="section wrap" id="project">
+      <div class="section-head">
+        <h2>System services for an isolated, high-renewable grid</h2>
+        <p class="sub">Self-directed project, 2026. Built with PyPSA, linopy, HiGHS and Python.</p>
+      </div>
+
+      <div class="prose">
+        <p>How much does it cost to keep a power grid stable when it can't lean on its neighbours, most of its electricity comes from wind and solar, and transport runs on electricity? And which assets should provide the stability?</p>
+        <p>To find out, I built a four-zone model of Germany and ran it as an island, with no interconnectors, so that it has to cover every reserve and inertia need itself, as Iceland or Ireland must. It uses real hourly demand, wind and solar data for 2019, scaled to the 2030 national targets, plus a stochastic simulation of 15 million electric cars and 60,000 trucks. On top of PyPSA's standard formulation I wrote custom constraints for linearised unit commitment, upward reserve, and a minimum-inertia limit that battery fast frequency response can partly replace.</p>
+      </div>
+
+      <figure class="waterfall-fig">
+        <figcaption>
+          <h3>Annual system cost in 2030, bn € per year</h3>
+          <p>Each step changes one thing in the model. Hourly resolution, full year.</p>
+        </figcaption>
+        <div class="chart-box">
+          <svg id="waterfall" role="img" aria-label="Waterfall chart of 2030 system cost. Without stability rules 10.03 billion euros; reserve and inertia requirements add 1.69; battery fast frequency response saves 1.12; smart EV charging saves 1.16; result 9.44 billion euros."></svg>
+          <div class="tooltip" id="wf-tip" hidden></div>
+        </div>
+        <div class="visually-hidden"><table>
+          <caption>Annual system cost by scenario step</caption>
+          <tr><th>Step</th><th>bn € per year</th></tr>
+          <tr><td>2030 without stability rules</td><td>10.03</td></tr>
+          <tr><td>Reserve and inertia requirements</td><td>+1.69</td></tr>
+          <tr><td>Batteries provide fast frequency response</td><td>−1.12</td></tr>
+          <tr><td>Half of EVs charge smartly</td><td>−1.16</td></tr>
+          <tr><td>Result</td><td>9.44</td></tr>
+        </table></div>
+      </figure>
+
+      <div class="findings">
+        <h3>What the model shows</h3>
+        <ul>
+          <li><strong>Stability is expensive when you're on your own.</strong> Requiring enough reserve and inertia raises system cost by 17&nbsp;%. Gas plants kept online for their spinning mass must run at minimum output, which pushes wind and solar off the grid: curtailment rises from 20.6&nbsp;% to 24.2&nbsp;%.</li>
+          <li><strong>Batteries remove two thirds of that cost</strong> by providing fast frequency response alongside their normal energy trading. What remains is the cost of the spinning inertia that only real machines can supply in the first half second.</li>
+          <li><strong>Smart EV charging is worth more for when it charges than for reserves.</strong> Moving charging into hours of surplus wind and solar saves €1.16 bn a year and avoids 6 GW of new gas turbines. EVs pausing to offer reserve adds almost nothing.</li>
+          <li><strong>The results hold at both 1-hour and 3-hour resolution.</strong> Scenario differences changed by at most €0.03 bn.</li>
+        </ul>
+      </div>
+
+      <div class="fig-pair">
+        <figure class="plot">
+          <img src="assets/fig3_inertia.png" alt="Inertia duration curves: in 2019 the system always has well over 75 GWs of inertia; in 2030 without constraints inertia falls below 75 GWs about two thirds of the year and near zero in the windiest hours." loading="lazy" width="850" height="420">
+          <figcaption>Hours of the year ranked by synchronous inertia. Without a rule, the 2030 system falls far below the 75 GWs needed to limit the rate of frequency fall to 1 Hz/s.</figcaption>
+        </figure>
+        <figure class="plot">
+          <img src="assets/fig1_network.png" alt="Map of the four German transmission zones with installed capacity mix per zone and optimal grid expansion on the TenneT–Amprion corridor." loading="lazy" width="600" height="880">
+          <figcaption>The four transmission zones, their 2030 capacity mix, and the grid expansion the model chooses.</figcaption>
+        </figure>
+      </div>
+
+      <p class="project-links">
+        <a class="btn btn-primary" href="https://github.com/YOURNAME/isolated-grid-services">Code and full write-up on GitHub</a>
+      </p>
+      <p class="limits">Limitations, stated in the write-up: four zones with no loop flows; stability approximated by reserve and rate-of-change limits rather than dynamic simulation; one weather year. A natural next step is a frequency-nadir constraint and a real network model of an island grid.</p>
+    </section>
+
+    <!-- ============================================================ other work -->
+    <section class="section wrap" id="work">
+      <div class="section-head">
+        <h2>Other work</h2>
+      </div>
+      <article class="entry">
+        <p class="entry-meta">Master's thesis<br>Siemens Energy and FAU<br>2026, grade 1.9</p>
+        <div class="entry-body">
+          <h3>Electrolyte flow in a redox flow cell</h3>
+          <p>Built a 3D CFD model of a laboratory flow-battery cell in STAR-CCM+, treating the carbon-felt electrode as a porous medium, and validated it against pressure-loss measurements on a test rig I designed and commissioned. After finding and correcting a geometry error, the model matched the measurements within about 4&nbsp;% across all electrode compressions, using only datasheet permeability. Processed multi-day logs from the rig in Python, which traced erratic data to pump pulsation and a sensor offset.</p>
+          <p class="tags">STAR-CCM+, Python, imc DAQ, test-rig design</p>
+        </div>
+      </article>
+      <article class="entry">
+        <p class="entry-meta">Course project<br>FAU Erlangen-Nürnberg</p>
+        <div class="entry-body">
+          <h3>Model of the German electricity market</h3>
+          <p>Optimisation model of the German power market with renewable, gas and coal generation and energy storage, used to analyse prices, supply adequacy and residual demand at high renewable shares.</p>
+          <p class="tags">GAMS, linear optimisation</p>
+        </div>
+      </article>
+      <article class="entry">
+        <p class="entry-meta">Internship<br>Calvergy, 2025</p>
+        <div class="entry-body">
+          <h3>Component models for energy-system digital twins</h3>
+          <p>Wrote Python models of energy storage and heat pumps for optimisation software that finds the cost-optimal size and configuration of real energy systems.</p>
+          <p class="tags">Python, thermodynamic modelling</p>
+        </div>
+      </article>
+    </section>
+
+    <!-- ============================================================ experience -->
+    <section class="section wrap" id="experience">
+      <div class="section-head">
+        <h2>Experience</h2>
+      </div>
+      <ol class="timeline">
+        <li>
+          <p class="when">Oct – Dec 2025</p>
+          <div>
+            <h3>Energy Engineering Intern, Calvergy</h3>
+            <p>Python models of storage and heat pumps for digital twins and cost-optimal system sizing.</p>
+          </div>
+        </li>
+        <li>
+          <p class="when">Jan – Dec 2025</p>
+          <div>
+            <h3>Working Student, Long Duration Energy Storage, Siemens Energy</h3>
+            <p>Simulated flow-battery cells in NX and STAR-CCM+ to catch design flaws early. Screened and benchmarked storage technologies and market players for R&amp;D and strategy teams.</p>
+          </div>
+        </li>
+        <li>
+          <p class="when">Aug 2022 – Aug 2023</p>
+          <div>
+            <h3>Assistant Manager, Operations &amp; Maintenance, Adani Power</h3>
+            <p>Ran turbine and balance-of-plant maintenance projects at a supercritical, grid-connected thermal power plant. Simulated the boiler feed pump turbine in ANSYS Fluent and coordinated engineering, procurement and contractors.</p>
+          </div>
+        </li>
+      </ol>
+
+      <h2 class="subsection">Education</h2>
+      <ol class="timeline">
+        <li>
+          <p class="when">2023 – 2026</p>
+          <div>
+            <h3>M.Sc. Clean Energy Processes, FAU Erlangen-Nürnberg</h3>
+            <p>Specialisation in energy technologies. Coursework in energy market modelling, energy storage, fuel cells and electrolysers, photovoltaics.</p>
+          </div>
+        </li>
+        <li>
+          <p class="when">2018 – 2022</p>
+          <div>
+            <h3>B.E. Mechanical Engineering, BMS Institute of Technology and Management, Bengaluru</h3>
+            <p>Thermodynamics, fluid mechanics, energy engineering.</p>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ============================================================ skills -->
+    <section class="section wrap" id="skills">
+      <div class="section-head">
+        <h2>Tools and skills</h2>
+      </div>
+      <dl class="skills">
+        <div><dt>Energy-system modelling</dt><dd>PyPSA, linopy, HiGHS, GAMS, linear optimisation, capacity expansion, model validation</dd></div>
+        <div><dt>Programming and data</dt><dd>Python (pandas, NumPy, xarray, Matplotlib), MATLAB, SQL, C/C++, Git</dd></div>
+        <div><dt>Simulation</dt><dd>STAR-CCM+, ANSYS Fluent and Workbench, Siemens NX</dd></div>
+        <div><dt>Experimental</dt><dd>Test-rig design and commissioning, pressure and flow measurement, imc data acquisition, electrochemical cell testing</dd></div>
+        <div><dt>Languages</dt><dd>English (fluent), Hindi (native), German (A2, learning)</dd></div>
+      </dl>
+    </section>
+
+    <!-- ============================================================ contact -->
+    <section class="section wrap contact" id="contact">
+      <h2>Get in touch</h2>
+      <p class="contact-line">The fastest way to reach me is email.</p>
+      <ul class="contact-list">
+        <li><a href="mailto:singh.shivamk@gmail.com">singh.shivamk@gmail.com</a></li>
+        <li><a href="https://linkedin.com/in/kumar2k">LinkedIn</a></li>
+        <li><a href="https://github.com/YOURNAME">GitHub</a></li>
+        <li><a href="cv.pdf">CV (PDF)</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">Shivam Kumar, 2026</div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
